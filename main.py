@@ -10,6 +10,11 @@ from database import SessionLocal, Servis, ServisniNalog
 
 # --- KONFIGURACIJA ---
 app = FastAPI(title="MobiFix SaaS")
+# Dodaj ovo ispod app = FastAPI(...)
+@app.get("/debug/routes")
+def get_routes():
+    return [{"path": route.path, "name": route.name} for route in app.routes]
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
