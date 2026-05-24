@@ -1,12 +1,12 @@
 import os
 import bcrypt
+import uvicorn
 from typing import Optional
 from fastapi import FastAPI, Form, Request, Depends, Cookie
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import SessionLocal, Servis, ServisniNalog
-
 
 # --- KONFIGURACIJA ---
 app = FastAPI(title="MobiFix SaaS")
@@ -46,17 +46,22 @@ def admin_panel(request: Request, servis_id: Optional[str] = Cookie(None), db: S
     servis = db.query(Servis).filter(Servis.id == int(servis_id)).first()
     if not servis: return RedirectResponse(url="/login")
     
-    # UPIT SE SADA NALAZI OVDJE, UNUTAR FUNKCIJE
-    nalozi = db.query(ServisniNalog).filter(
-        ServisniNalog.servis_id == servis.id,
-        ServisniNalog.status != "zavrseno"
-    ).all()
-    
-    return templates.TemplateResponse(
-        request=request, 
-        name="admin.html", 
-        context={"servis": servis, "nalozi": nalozi}
-    )
+    nalozi = db.query(ServisniNalog).filter(ServisniNalog.servis_id == servis.id, ServisniNalog.status != "zavrseno").all()
+    return templates.TemplateResponse(request=request, name="admin.html", context={"servis": servis, "nalozi": nalozi})
+
+@app.post("/dodaj-nalog")
+def dodaj_nalog(
+    ime_klijenta: str = Form(...),
+    uredaj: str = Form(...),
+    opis_kvara: str = Form(...),
+    servis_id: Optional[str] = Cookie(None),
+    db: Session = Depends(get_db)
+):
+    if not servis_id: return RedirectResponse(url="/login")
+    novi_nalog = ServisniNalog(servis_id=int(servis_id), ime_klijenta=ime_klijenta, uredaj=uredaj, opis_kvara=opis_kvara, status="zaprimljeno")
+    db.add(novi_nalog)
+    db.commit()
+    return RedirectResponse(url="/admin", status_code=303)
 
 @app.get("/logout")
 def odjava():
@@ -64,7 +69,7 @@ def odjava():
     odgovor.delete_cookie(key="servis_id")
     return odgovor
 
+# --- POKRETANJE ---
 if __name__ == "__main__":
-    import uvicorn
     port = int(os.environ.get("PORT", 10000))
     uvicorn.run(app, host="0.0.0.0", port=port)
