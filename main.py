@@ -11,6 +11,21 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import SessionLocal, Servis, Klijent, ServisniNalog
+from pony.orm import Database, Required, Optional, db_session
+
+db = Database()
+
+# Primjer modela za korisnika
+class User(db.Model):
+    id = PrimaryKey(int, auto=True)
+    username = Required(str, unique=True)
+    password = Required(str)
+    email = Optional(str)
+
+# Povezivanje s bazom (koristit ćemo SQLite za početak jer je najlakše)
+db.bind(provider='sqlite', filename='mobifix.db', create_db=True)
+db.generate_mapping(create_tables=True)
+
 
 print("--- KOD JE USPJEŠNO UČITAN I RADI! ---")
 
