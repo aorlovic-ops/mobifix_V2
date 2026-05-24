@@ -46,5 +46,3 @@ class ServisniNalog(Base):
     status = Column(String, default='zaprimljeno')
     servis = relationship("Servis", back_populates="nalozi")
     klijent = relationship("Klijent", back_populates="nalozi")
-
-Base.metadata.create_all(bind=engine)
