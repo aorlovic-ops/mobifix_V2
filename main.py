@@ -1,11 +1,12 @@
 import os
 import bcrypt
 from typing import Optional
-from fastapi import FastAPI, Form, Request, Cookie
+from fastapi import FastAPI, Form, Request, Depends, Cookie
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import SessionLocal, Servis, ServisniNalog
+
 
 # --- KONFIGURACIJA ---
 app = FastAPI(title="MobiFix SaaS")
@@ -62,3 +63,8 @@ def odjava():
     odgovor = RedirectResponse(url="/login")
     odgovor.delete_cookie(key="servis_id")
     return odgovor
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
