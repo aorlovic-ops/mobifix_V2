@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MobiFix | Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased">
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">🛠️</span>
+                    <div>
+                        <span class="text-xl font-bold tracking-tight text-slate-900">MobiFix</span>
+                        <span class="text-xs block text-blue-600 font-medium -mt-1">SaaS Admin</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-right hidden sm:block">
+                        <div class="text-sm font-semibold text-slate-700">{{ servis.naziv_obrta }}</div>
+                        <div class="text-xs text-slate-400">Vlasnik: {{ servis.vlasnik_ime }}</div>
+                    </div>
+                    <a href="/logout" class="bg-rose-50 hover:bg-rose-100 text-rose-600 text-sm font-medium px-4 py-2 rounded-xl transition-all duration-200 border border-rose-200/50">
+                        Odjava
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Nadzorna ploča</h1>
+            <p class="text-sm text-slate-500 mt-1">Upravljajte servisnim nalozima, pratite statuse i financijski profit u realnom vremenu.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Zaprimljeni nalozi</p>
+                    <h3 class="text-3xl font-bold text-slate-800 mt-1">{{ stat_zaprimljeno }}</h3>
+                </div>
+                <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                    📥
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Trenutno u radu</p>
+                    <h3 class="text-3xl font-bold text-slate-800 mt-1">{{ stat_radu }}</h3>
+                </div>
+                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                    🛠️
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Ukupni čisti profit</p>
+                    <h3 class="text-3xl font-bold text-emerald-600 mt-1">{{ "%.2f"|format(stat_profit or 0.0) }} €</h3>
+                </div>
+                <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                    💶
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <h2 class="text-base font-bold text-slate-800">Aktivni servisni nalozi</h2>
+                <span class="text-xs bg-blue-100 text-blue-700 font-semibold px-2.5 py-1 rounded-full">
+                    Ukupno: {{ nalozi|length }}
+                </span>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-200 bg-slate-50/30 text-slate-400 font-semibold uppercase text-xs tracking-wider">
+                            <th class="py-3.5 px-6">ID & Token</th>
+                            <th class="py-3.5 px-6">Klijent</th>
+                            <th class="py-3.5 px-6">Uređaj i opis kvara</th>
+                            <th class="py-3.5 px-6 text-center">Status i financije</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for nalog in nalozi %}
+                        <tr class="hover:bg-slate-50/70 transition-colors duration-150">
+                            <td class="py-4 px-6">
+                                <span class="bg-blue-50 text-blue-700 font-mono font-bold px-2 py-1 rounded-lg text-xs border border-blue-100">
+                                    #{{ nalog.tracking_token }}
+                                </span>
+                                <div class="text-[10px] text-slate-400 mt-1 pl-1">ID naloga: {{ nalog.id }}</div>
+                            </td>
+                            
+                            <td class="py-4 px-6">
+                                <div class="font-semibold text-slate-900">{{ nalog.klijent.ime_prezime }}</div>
+                                <div class="text-xs text-slate-500 flex items-center space-x-1 mt-0.5">
+                                    <span>📞 {{ nalog.klijent.broj_telefona }}</span>
+                                </div>
+                                <div class="text-xs text-blue-600 font-medium truncate max-w-[180px]">{{ nalog.klijent.email }}</div>
+                            </td>
+                            
+                            <td class="py-4 px-6">
+                                <div class="flex items-center space-x-1.5 mb-1">
+                                    <span class="font-bold text-slate-700 uppercase text-[10px] bg-slate-200/70 px-2 py-0.5 rounded tracking-wide">
+                                        {{ nalog.brand }}
+                                    </span>
+                                    <span class="text-slate-900 font-semibold text-xs">{{ nalog.model_uredjaja }}</span>
+                                </div>
+                                <p class="text-xs text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-100 leading-relaxed max-w-sm whitespace-pre-line">
+                                    {{ nalog.opis_kvara }}
+                                </p>
+                            </td>
+                            
+                            <td class="py-4 px-6">
+                                <form action="/admin/azuriraj-nalog/{{ nalog.id }}" method="POST" class="bg-slate-50 p-3 rounded-xl border border-slate-200/60 flex flex-wrap gap-3 items-center justify-center max-w-md mx-auto">
+                                    
+                                    <div class="flex flex-col">
+                                        <label class="text-[10px] uppercase font-bold text-slate-400 mb-0.5">Status</label>
+                                        <select name="status" class="bg-white border border-slate-200 text-slate-700 rounded-lg p-1.5 text-xs font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none">
+                                            <option value="zaprimljeno" {% if nalog.status == "zaprimljeno" %}selected{% endif %}>📥 Zaprimljeno</option>
+                                            <option value="u_radu" {% if nalog.status == "u_radu" %}selected{% endif %}>🛠️ U radu</option>
+                                            <option value="zavrseno" {% if nalog.status == "zavrseno" %}selected{% endif %}>✅ Završeno</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="flex flex-col w-20">
+                                        <label class="text-[10px] uppercase font-bold text-slate-400 mb-0.5">Cijena (€)</label>
+                                        <input type="number" name="dogovorena_cijena" step="0.01" value="{{ nalog.dogovorena_cijena or 0.0 }}" class="bg-white border border-slate-200 rounded-lg p-1.5 text-xs text-center font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none">
+                                    </div>
+
+                                    <div class="flex flex-col w-20">
+                                        <label class="text-[10px] uppercase font-bold text-slate-400 mb-0.5">Profit (€)</label>
+                                        <input type="number" name="profit" step="0.01" value="{{ nalog.profit or 0.0 }}" class="bg-white border border-slate-200 rounded-lg p-1.5 text-xs text-center font-semibold text-emerald-600 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:outline-none">
+                                    </div>
+
+                                    <div class="flex flex-col pt-3">
+                                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-sm shadow-blue-500/10 transition-all duration-150 cursor-pointer active:scale-95">
+                                            Spremi
+                                        </button>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="py-12 text-center text-slate-400">
+                                <div class="text-3xl mb-2">📭</div>
+                                <div class="font-medium">Trenutno nema zaprimljenih popravaka.</div>
+                                <div class="text-xs text-slate-400 mt-0.5">Svi zahtjevi s javne forme pojavit će se ovdje.</div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
