@@ -22,6 +22,35 @@ def get_db():
         db.close()
 
 # --- RUTE ---
+@app.get("/test")
+def test_ruta():
+    return {"message": "Server radi!"}
+@app.post("/register")
+def izvrši_registraciju(
+    naziv_obrta: str = Form(...),
+    vlasnik_ime: str = Form(...),
+    email: str = Form(...),
+    lozinka: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    # Provjera postoji li već korisnik
+    if db.query(Servis).filter(Servis.email == email).first():
+        return HTMLResponse("Email je već registriran!", status_code=400)
+    
+    # Hashiranje lozinke
+    hashed = bcrypt.hashpw(lozinka.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    
+    # Kreiranje objekta
+    novi_servis = Servis(
+        naziv_obrta=naziv_obrta, 
+        vlasnik_ime=vlasnik_ime, 
+        email=email, 
+        lozinka_hash=hashed
+    )
+    
+    db.add(novi_servis)
+    db.commit()
+    return RedirectResponse(url="/login", status_code=303)
 
 @app.get("/", response_class=HTMLResponse)
 def read_root():
