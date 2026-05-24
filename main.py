@@ -1,35 +1,23 @@
 import os
 import bcrypt
-import uvicorn
+import secrets
 from typing import Optional
 from fastapi import FastAPI, Form, Request, Depends, Cookie
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from database import SessionLocal, Servis, ServisniNalog
+from database import SessionLocal, Servis, ServisniNalog, Klijent
 
-# --- KONFIGURACIJA ---
 app = FastAPI(title="MobiFix SaaS")
-# Dodaj ovo ispod app = FastAPI(...)
-@app.get("/debug/routes")
-def get_routes():
-    return [{"path": route.path, "name": route.name} for route in app.routes]
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
-# --- DEPENDENCY ZA BAZU ---
 def get_db():
     db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    try: yield db
+    finally: db.close()
 
-# --- RUTE ---
-@app.get("/test")
-def test_ruta():
-    return {"message": "Server radi!"}
+# --- RUTE ZA REGISTRACIJU I LOGIN ---
 @app.post("/register")
 def izvrši_registraciju(
     naziv_obrta: str = Form(...),
@@ -38,72 +26,69 @@ def izvrši_registraciju(
     lozinka: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    # Provjera postoji li već korisnik
-    if db.query(Servis).filter(Servis.email == email).first():
-        return HTMLResponse("Email je već registriran!", status_code=400)
-    
-    # Hashiranje lozinke
+    # Koristi bcrypt za hashiranje
     hashed = bcrypt.hashpw(lozinka.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-    
-    # Kreiranje objekta
-    novi_servis = Servis(
-        naziv_obrta=naziv_obrta, 
-        vlasnik_ime=vlasnik_ime, 
-        email=email, 
-        lozinka_hash=hashed
-    )
-    
+    novi_servis = Servis(naziv_obrta=naziv_obrta, vlasnik_ime=vlasnik_ime, email=email, lozinka_hash=hashed)
     db.add(novi_servis)
     db.commit()
     return RedirectResponse(url="/login", status_code=303)
 
-@app.get("/", response_class=HTMLResponse)
-def read_root():
-    return RedirectResponse(url="/login")
-
-@app.get("/login", response_class=HTMLResponse)
-def prikaži_login(request: Request):
-    return templates.TemplateResponse(request=request, name="login.html")
-
-@app.post("/login")
-def izvrši_prijavu(email: str = Form(...), lozinka: str = Form(...), db: Session = Depends(get_db)):
-    servis = db.query(Servis).filter(Servis.email == email).first()
-    if not servis or not bcrypt.checkpw(lozinka.encode('utf-8'), servis.lozinka_hash.encode('utf-8')):
-        return HTMLResponse("Krivi podaci!", status_code=400)
-    odgovor = RedirectResponse(url="/admin", status_code=303)
-    odgovor.set_cookie(key="servis_id", value=str(servis.id), httponly=True)
-    return odgovor
-
-@app.get("/admin", response_class=HTMLResponse)
-def admin_panel(request: Request, servis_id: Optional[str] = Cookie(None), db: Session = Depends(get_db)):
-    if not servis_id: return RedirectResponse(url="/login")
-    servis = db.query(Servis).filter(Servis.id == int(servis_id)).first()
-    if not servis: return RedirectResponse(url="/login")
-    
-    nalozi = db.query(ServisniNalog).filter(ServisniNalog.servis_id == servis.id, ServisniNalog.status != "zavrseno").all()
-    return templates.TemplateResponse(request=request, name="admin.html", context={"servis": servis, "nalozi": nalozi})
-
 @app.post("/dodaj-nalog")
 def dodaj_nalog(
     ime_klijenta: str = Form(...),
-    uredaj: str = Form(...),
+    broj_telefona: str = Form(...),
+    email: str = Form(...),
+    brand: str = Form(...),
+    model_uredjaja: str = Form(...),
+    opis_kvara: str = Form(...),
+    servis_id: Optional[str] = Cookie(None),
+    db: Session = Depends(get_db)
+):
+    # 1. Kreiraj klijenta
+    klijent = Klijent(servis_id=int(servis_id), ime_prezime=ime_klijenta, broj_telefona=broj_telefona, email=email)
+    db.add(klijent)
+    db.flush() # Dobijemo ID klijenta
+    
+    # 2. Kreiraj nalog
+    nalog = ServisniNalog(
+        servis_id=int(servis_id), klijent_id=klijent.id, 
+        tracking_token=secrets.token_hex(3).upper(),
+        brand=brand, model_uredjaja=model_uredjaja, opis_kvara=opis_kvara
+    )
+    db.add(nalog)
+    db.commit()
+    return RedirectResponse(url="/admin", status_code=303)
+
+# --- RUTA ZA DODAVANJE NALOGA (USKLAĐENA S BAZOM) ---
+@app.post("/dodaj-nalog")
+def dodaj_nalog(
+    ime_klijenta: str = Form(...),
+    broj_telefona: str = Form(...),
+    email: str = Form(...),
+    brand: str = Form(...),
+    model_uredjaja: str = Form(...),
     opis_kvara: str = Form(...),
     servis_id: Optional[str] = Cookie(None),
     db: Session = Depends(get_db)
 ):
     if not servis_id: return RedirectResponse(url="/login")
-    novi_nalog = ServisniNalog(servis_id=int(servis_id), ime_klijenta=ime_klijenta, uredaj=uredaj, opis_kvara=opis_kvara, status="zaprimljeno")
+    
+    # 1. Prvo kreiramo klijenta jer nalog zahtijeva klijent_id
+    novi_klijent = Klijent(servis_id=int(servis_id), ime_prezime=ime_klijenta, broj_telefona=broj_telefona, email=email)
+    db.add(novi_klijent)
+    db.flush() # Dobivamo ID bez commit-a
+    
+    # 2. Sada kreiramo nalog sa svim obaveznim poljima iz baze
+    novi_nalog = ServisniNalog(
+        servis_id=int(servis_id),
+        klijent_id=novi_klijent.id,
+        tracking_token=secrets.token_hex(3).upper(),
+        brand=brand,
+        model_uredjaja=model_uredjaja,
+        serijski_imei="N/A",
+        opis_kvara=opis_kvara,
+        status="zaprimljeno"
+    )
     db.add(novi_nalog)
     db.commit()
     return RedirectResponse(url="/admin", status_code=303)
-
-@app.get("/logout")
-def odjava():
-    odgovor = RedirectResponse(url="/login")
-    odgovor.delete_cookie(key="servis_id")
-    return odgovor
-
-# --- POKRETANJE ---
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
