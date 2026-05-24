@@ -13,6 +13,12 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from sqlalchemy.orm import Session
 from database import SessionLocal, Servis, Klijent, ServisniNalog, User  # Pretpostavljam da si User dodao u models/database.py
 
+# Primjer: dohvati samo aktivne naloge koji nisu 'zavrseno'
+nalozi = db.query(ServisniNalog).filter(
+    ServisniNalog.servis_id == servis.id,
+    ServisniNalog.status != "zavrseno"
+).all()
+
 # --- KONFIGURACIJA ---
 app = FastAPI(title="MobiFix SaaS")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
