@@ -17,7 +17,7 @@ print("--- KOD JE USPJEŠNO UČITAN I RADI! ---")
 app = FastAPI(title="MobiFix SaaS")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+# app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 # --- KONFIGURACIJA ZA SLANJE EMAILOVA ---
