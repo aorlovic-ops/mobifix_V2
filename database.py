@@ -34,6 +34,7 @@ class Klijent(Base):
     id = Column(Integer, primary_key=True, index=True)
     servis_id = Column(Integer, ForeignKey("servisi.id"), nullable=False)
     ime_prezime = Column(String, nullable=False)
+    broj_telefona = Column(String, nullable=False) # DODAJ OVO!
     email = Column(String, nullable=False)
     servis = relationship("Servis", back_populates="klijenti")
     nalozi = relationship("ServisniNalog", back_populates="klijent")
@@ -46,3 +47,10 @@ class ServisniNalog(Base):
     status = Column(String, default='zaprimljeno')
     servis = relationship("Servis", back_populates="nalozi")
     klijent = relationship("Klijent", back_populates="nalozi")
+class Servis(Base):
+    __tablename__ = "servisi"
+    id = Column(Integer, primary_key=True)
+    naziv_obrta = Column(String)
+    vlasnik_ime = Column(String)
+    email = Column(String, unique=True)
+    lozinka_hash = Column(String)
