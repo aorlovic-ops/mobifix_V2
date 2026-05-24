@@ -15,6 +15,9 @@ from database import SessionLocal, Servis, Klijent, ServisniNalog
 print("--- KOD JE USPJEŠNO UČITAN I RADI! ---")
 
 app = FastAPI(title="MobiFix SaaS")
+@app.get("/")
+def read_root():
+    return {"message": "MobiFix SaaS je uspješno pokrenut!"}
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
