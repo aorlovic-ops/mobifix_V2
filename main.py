@@ -39,9 +39,7 @@ def provjeri_super_admin_ovlasti(credentials: HTTPBasicCredentials = Depends(sec
     return credentials.username
 
 # --- RUTE ---
-@app.get("/")
-def read_root():
-    return {"message": "Sada radi!"}
+
 @app.get("/", response_class=HTMLResponse)
 def read_root():
     return RedirectResponse(url="/login")
