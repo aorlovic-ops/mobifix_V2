@@ -2,6 +2,14 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Float, Text
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+# Kreiranje lokalne SQLite baze podataka unutar kontejnera
+DATABASE_URL = "sqlite:///./mobifix.db"
+
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
