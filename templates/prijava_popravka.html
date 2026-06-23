@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MobiFix - Prijava Popravka</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans flex items-center justify-center p-4">
+
+    <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 max-w-lg w-full">
+        <div class="text-center mb-8">
+            <span class="text-3xl font-extrabold text-slate-800 tracking-tight">Mobi<span class="text-blue-600">fix</span></span>
+            <h1 class="text-xl font-bold text-slate-800 mt-3">Prijava uređaja na servis</h1>
+            <p class="text-sm text-slate-500 mt-1">Unesite podatke kako bismo zaprimili Vaš uređaj.</p>
+        </div>
+
+        <form action="/prijava-popravka" method="POST" class="space-y-4">
+            
+            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-1">Vaši Podaci</h3>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Ime i Prezime</label>
+                <input type="text" name="ime_prezime" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Broj telefona</label>
+                    <input type="text" name="broj_telefona" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">E-mail adresa</label>
+                    <input type="email" name="email" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                </div>
+            </div>
+
+            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-1 pt-2">Podaci o uređaju</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Proizvođač (Brand)</label>
+                    <input type="text" name="brand" placeholder="npr. Apple" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Model uređaja</label>
+                    <input type="text" name="model_uredaja" placeholder="npr. iPhone 13" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Opis kvara / problema</label>
+                <textarea name="opis_kvara" rows="3" required placeholder="Napišite što se dogodilo..." class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"></textarea>
+            </div>
+            
+            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-1 pt-2">Dodatna oprema (ako je donesena)</h3>
+            <div class="grid grid-cols-2 gap-2 text-sm text-slate-700 pt-1">
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" name="oprema" value="Slušalice" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                    <span>🎧 Slušalice</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" name="oprema" value="Kutija" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                    <span>📦 Kutija</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" name="oprema" value="SIM kartica" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                    <span>💳 SIM kartica</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" name="oprema" value="Baterija" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                    <span>🔋 Baterija</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" name="oprema" value="USB kabel" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                    <span>🔌 USB kabel</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" name="oprema" value="Adapter" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                    <span>🔌 Adapter (Punjač)</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" name="oprema" value="Memorijska kartica" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                    <span>💾 Memorijska kartica</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" name="oprema" value="Torbica" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                    <span>👛 Torbica / Maskica</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" name="oprema" value="Daljinski" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                    <span>🎮 Daljinski</span>
+                </label>
+            </div>
+            
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-xl transition-all cursor-pointer shadow-sm text-sm mt-4">
+                🚀 Pošalji zahtjev za popravak
+            </button>
+        </form>
+    </div>
+
+</body>
+</html>

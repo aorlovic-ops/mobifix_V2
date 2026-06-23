@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MobiFix | Admin Panel (Pregled i Uređivanje)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased">
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">🛠️</span>
+                    <span class="text-xl font-bold tracking-tight text-slate-900">MobiFix Admin Panel</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-slate-600 hover:text-blue-600 text-sm font-medium transition">🏠 Početna</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900">Popis Aktivnih Naloga</h1>
+                <p class="text-sm text-slate-500 mt-1">Ovdje možete detaljno pregledati, mijenjati opise, pratiti statuse i brisati zaprimljene uređaje.</p>
+            </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                            <th class="py-4 px-6 w-16">ID</th>
+                            <th class="py-4 px-6">Klijent</th>
+                            <th class="py-4 px-6">Uređaj</th>
+                            <th class="py-4 px-6 max-w-xs">Opis Kvara & Oprema</th>
+                            <th class="py-4 px-6 w-40">Status</th>
+                            <th class="py-4 px-6 text-right w-48">Akcije</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm">
+                        {% for nalog in nalozi %}
+                        <tr class="hover:bg-slate-50/80 transition-colors">
+                            <td class="py-4 px-6 font-mono text-xs font-bold text-blue-600">#{{ nalog.id }}</td>
+                            <td class="py-4 px-6 font-medium text-slate-900">{{ nalog.ime_klijenta }}</td>
+                            <td class="py-4 px-6">
+                                <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold mr-1">{{ nalog.brand }}</span>
+                                {{ nalog.model_uredjaja }}
+                            </td>
+                            <td class="py-4 px-6 max-w-xs truncate text-slate-500" title="{{ nalog.opis_kvara }}">
+                                {{ nalog.opis_kvara }}
+                            </td>
+                            <td class="py-4 px-6">
+                                <form action="/admin/azuriraj-nalog/{{ nalog.id }}" method="POST" class="inline">
+                                    <select name=\"status\" onchange="this.form.submit()" class="border border-slate-200 rounded-lg p-1.5 text-xs bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none font-medium text-slate-700 cursor-pointer">
+                                        <option value="zaprimljeno" {% if nalog.status == 'zaprimljeno' %}selected{% endif %}>📥 Zaprimljeno</option>
+                                        <option value="u_radu" {% if nalog.status == 'u_radu' %}selected{% endif %}>⏳ U radu</option>
+                                        <option value="zavrseno" {% if nalog.status == 'zavrseno' %}selected{% endif %}>✅ Završeno</option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td class="py-4 px-6 text-right space-x-2">
+                                <button onclick="otvoriModal('{{ nalog.id }}', '{{ nalog.ime_klijenta }}', '{{ nalog.brand }}', '{{ nalog.model_uredjaja }}', '{{ nalog.opis_kvara | replace('\'', '\\\'') }}', '{{ nalog.status }}')" 
+                                        class="bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-semibold px-3 py-1.5 rounded-lg border border-blue-200/50 transition cursor-pointer">
+                                    🔍 Uredi / Detalji
+                                </button>
+                                
+                                <form action="/admin/obrisi-nalog/{{ nalog.id }}" method="POST" class="inline" onsubmit="return confirm('Sigurno želiš trajno obrisati ovaj nalog i podatke klijenta?');">
+                                    <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-200/50 transition cursor-pointer">
+                                        🗑️ Obriši
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
+                                Trenutno nema aktivnih servisnih naloga u sustavu.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div id="urediModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full border border-slate-200 overflow-hidden transform scale-95 transition-transform duration-200">
+            
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="text-base font-bold text-slate-900">Detaljni pregled i uređivanje naloga <span id="modalNalogId" class="text-blue-600 font-mono"></span></h3>
+                <button onclick="zatvoriModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold cursor-pointer">&times;</button>
+            </div>
+
+            <form id="modalForma" method="POST" class="p-6 space-y-4">
+                <input type="hidden" name="broj_telefona" value="N/A">
+                <input type="hidden" name="email" value="N/A">
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Ime i Prezime Klijenta</label>
+                    <input type="text" name="ime_prezime" id="modalIme" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Proizvođač (Brand)</label>
+                        <input type="text" name="brand" id="modalBrand" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Model Uređaja</label>
+                        <input type="text" name="model_uredjaja" id="modalModel" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Puni opis kvara i dodatna oprema</label>
+                    <textarea name="opis_kvara" id="modalOpis" rows="4" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Trenutni Status</label>
+                    <select name="status" id="modalStatus" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none">
+                        <option value="zaprimljeno">📥 Zaprimljeno</option>
+                        <option value="u_radu">⏳ U radu</option>
+                        <option value="zavrseno">✅ Završeno</option>
+                    </select>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 flex justify-end space-x-2">
+                    <button type="button" onclick="zatvoriModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer">Odustani</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow-sm cursor-pointer">Spremi Izmjene</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function otvoriModal(id, ime, brand, model, opis, status) {
+            document.getElementById('modalNalogId').innerText = '#' + id;
+            document.getElementById('modalIme').value = ime;
+            document.getElementById('modalBrand').value = brand;
+            document.getElementById('modalModel').value = model;
+            document.getElementById('modalOpis').value = opis;
+            document.getElementById('modalStatus').value = status;
+            
+            // Dinamički postavljamo action rute na formi ovisno o ID-u naloga
+            document.getElementById('modalForma').action = '/admin/uredi-nalog/' + id;
+            
+            // Prikaži modal
+            document.getElementById('urediModal').classList.remove('hidden');
+        }
+
+        function zatvoriModal() {
+            document.getElementById('urediModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

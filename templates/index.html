@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MobiFix | Pametni Sustav za Servise Mobitela</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased flex flex-col justify-between">
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🛠️</span>
+                    <span class="text-2xl font-extrabold tracking-tight text-slate-900">Mobi<span class="text-blue-600">Fix</span></span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/login" class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition">Prijava Servisera</a>
+                    <a href="/register" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-sm transition">Registriraj Obrt</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow flex flex-col justify-center">
+        
+        <div class="text-center max-w-2xl mx-auto mb-16">
+            <span class="bg-blue-50 text-blue-700 font-bold text-xs uppercase tracking-wider px-3 py-1.5 rounded-full border border-blue-100">
+                SaaS Platforma v2.0
+            </span>
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mt-4">
+                Sve za Vaš servis na <span class="text-blue-600">jednom mjestu</span>
+            </h1>
+            <p class="text-base text-slate-500 mt-4 leading-relaxed">
+                Dobrodošli u MobiFix ekosustav. Odaberite odgovarajuću opciju u nastavku kako biste pristupili sustavu prijava, administraciji ili upravljanju platformom.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+            
+            <div class="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm flex flex-col justify-between hover:border-blue-400 transition-all group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 text-2xl flex items-center justify-center font-bold mb-6 group-hover:scale-110 transition-transform">
+                        📱
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900">Portal za Klijente</h3>
+                    <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+                        Trebate popravak ekrana, baterije ili softvera? Brzo prijavite svoj uređaj na servis i pratite tijek popravka uživo.
+                    </p>
+                </div>
+                <div class="mt-8">
+                    <a href="/prijava-popravka" class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center font-semibold py-2.5 px-4 rounded-xl transition shadow-sm text-sm">
+                        🚀 Prijavi uređaj na servis
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm flex flex-col justify-between hover:border-indigo-400 transition-all group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 text-2xl flex items-center justify-center font-bold mb-6 group-hover:scale-110 transition-transform">
+                        🛠️
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900">Admin Panel za Servise</h3>
+                    <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+                        Upravljajte zaprimljenim radnim nalozima, ažurirajte statuse popravaka, vodite bazu klijenata i pratite učinkovitost obrta.
+                    </p>
+                </div>
+                <div class="mt-8">
+                    <a href="/admin" class="block w-full bg-slate-900 hover:bg-slate-800 text-white text-center font-semibold py-2.5 px-4 rounded-xl transition shadow-sm text-sm">
+                        ⚙️ Otvori Admin Panel
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-slate-950 border border-slate-800 p-8 rounded-2xl shadow-xl flex flex-col justify-between hover:border-purple-500 transition-all group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 text-2xl flex items-center justify-center font-bold mb-6 group-hover:scale-110 transition-transform">
+                        👑
+                    </div>
+                    <h3 class="text-lg font-bold text-white">Sustavni Super Admin</h3>
+                    <p class="text-sm text-slate-400 mt-2 leading-relaxed">
+                        Glavna upravljačka ploča za vlasnika platforme. Pregled svih registriranih servisa, statistika platforme i brisanje računa.
+                    </p>
+                </div>
+                <div class="mt-8">
+                    <a href="/super-admin" class="block w-full bg-purple-600 hover:bg-purple-700 text-white text-center font-semibold py-2.5 px-4 rounded-xl transition shadow-md text-sm border border-purple-500/20">
+                        🔑 Super Admin Ulaz
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="border-t border-slate-200 bg-white py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-400">
+            &copy; 2026 MobiFix. Sva prava pridržana. Razvijeno za potrebe projekta na fakultetu.
+        </div>
+    </footer>
+
+</body>
+</html>
