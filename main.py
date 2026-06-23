@@ -64,11 +64,8 @@ def zaprimi_popravak(
     email: str = Form(...),
     brand: str = Form(...),
     model_uredaja: str = Form(...),
-<<<<<<< HEAD
     imei: str = Form(...),
     napomena: str =Form(...),
-=======
->>>>>>> fbd0950911c9b0d7ff4859436d6fdff1333952e1
     opis_kvara: str = Form(...),
     oprema: List[str] = Form(default=[]),
     db: Session = Depends(get_db)
