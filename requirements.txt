@@ -7,3 +7,5 @@ bcrypt
 python-multipart
 jinja2
 sqlalchemy
+reportlab
+weasyprint
