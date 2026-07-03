@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 # Importi iz tvojih modula
 from database import Base, engine, SessionLocal, Servis, ServisniNalog, Klijent
-from utils.pdf_generator import create_ticket_pdf
+from pdf_generator import create_ticket_pdf
 
 # --- INICIJALIZACIJA ---
 app = FastAPI(title="MobiFix SaaS - Otvorena Verzija")
@@ -137,7 +137,7 @@ def obrisi_nalog(nalog_id: int, db: Session = Depends(get_db)):
     return RedirectResponse(url="/admin", status_code=303)
 
 from fastapi.responses import Response
-from utils.pdf_generator import create_ticket_pdf
+from pdf_generator import create_ticket_pdf
 
 @app.get("/tickets/{ticket_id}/pdf")
 def get_ticket_pdf(ticket_id: int, db: Session = Depends(get_db)):
