@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Text
 from sqlalchemy.orm import declarative_base, relationship, create_engine, sessionmaker
 
+# Kreiranje lokalne SQLite baze podataka
 DATABASE_URL = "sqlite:///./mobifix.db"
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
@@ -34,12 +35,12 @@ class ServisniNalog(Base):
     tracking_token = Column(String, nullable=False)
     brand = Column(String, nullable=False)
     model_uredjaja = Column(String, nullable=False)
-    imei_sn = Column(String, default="")          # Dodano polje
-    napomena_servisera = Column(Text, default="") # Dodano polje
+    imei_sn = Column(String, default="")
     opis_kvara = Column(Text, nullable=False)
     status = Column(String, default='zaprimljeno')
+    napomena_servisera = Column(Text, default="")
     
-    # Nova polja za checkboxove
+    # Polja za oštećenja (model podataka)
     ostecen_ekran = Column(Integer, default=0)
     ostecenje_vlagom = Column(Integer, default=0)
     
