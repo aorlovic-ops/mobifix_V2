@@ -1,11 +1,6 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Text
-from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, Integer, String, ForeignKey, Text
+from sqlalchemy.orm import declarative_base, relationship, create_engine, sessionmaker
 
-# Kreiranje lokalne SQLite baze podataka unutar kontejnera
 DATABASE_URL = "sqlite:///./mobifix.db"
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
@@ -39,7 +34,14 @@ class ServisniNalog(Base):
     tracking_token = Column(String, nullable=False)
     brand = Column(String, nullable=False)
     model_uredjaja = Column(String, nullable=False)
+    imei_sn = Column(String, default="")          # Dodano polje
+    napomena_servisera = Column(Text, default="") # Dodano polje
     opis_kvara = Column(Text, nullable=False)
     status = Column(String, default='zaprimljeno')
+    
+    # Nova polja za checkboxove
+    ostecen_ekran = Column(Integer, default=0)
+    ostecenje_vlagom = Column(Integer, default=0)
+    
     servis = relationship("Servis", back_populates="nalozi")
     klijent = relationship("Klijent", back_populates="nalozi")
